@@ -29,6 +29,7 @@ Version  2022-01-23
 
 #define PAGESIZE 4096
 
+// Print out put, Prints nothing if command doesnt exist
 void writeOutput(char *command, char *output)
 {
     FILE *fp;
@@ -46,144 +47,98 @@ int readFile(char *name, char (*commands)[100], int *count)
     char line[256];
     int c = 0;
 
-    char **tempPoint = (char **)malloc(1000);
-
+    // Get all file commands
     while (fgets(line, sizeof(line), file))
     {
-        /* note that fgets don't strip the terminating \n, checking its
-           presence would allow to handle lines longer that sizeof(line) */
-        printf("%s", line);
-        strncpy(commands[c], line, PAGESIZE);
-        // char *temp = line;
-        // fflush(stdout);
-
-        //commands[c] = strdup(line);
-        //*(commands + c) = line;
-        //*(tempPoint + c) = strdup(line);
-        //*(commands +c) = strdup(line);
-
-        //*(commands + c) = "line";
+        strncpy(commands[c], line, 100);
         c++;
     }
 
-    /* may check feof here to make a difference between eof and io failure -- network
-       timeout for instance */
-
     fclose(file);
-
-    // count = malloc(sizeof(int)+2);
-    // for (int i = 0; i < 5; i++)
-    //  *(commands + i) = strdup(*(tempPoint + i));
-
     *count = c;
+
     return 0;
 }
 
 int main()
 {
-    // Shared memory bank
-    int key = shm_open("/sample_in.txt", O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
-    ftruncate(key, 4096);
+    key_t key = ftok("test.txt", 0);
+    int shmid = shmget(key, PAGESIZE, 0644 | IPC_CREAT);
+    char(*data)[100] = (char(*)[100])shmat(shmid, NULL, 0);
 
+    // Shared memory bank
     int *shared_count = mmap(NULL, PAGESIZE,
                              PROT_READ | PROT_WRITE,
                              MAP_SHARED | MAP_ANONYMOUS, -1, 0);
-    char(*shared_memory)[100] = (char(*)[100]) mmap(NULL, PAGESIZE,
+    char(*shared_memory)[100] = (char(*)[100])mmap(NULL, PAGESIZE,
                                                    PROT_READ | PROT_WRITE,
                                                    MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     int child_id = fork();
     int fd[2];
     pipe(fd);
 
-    // shared_memory = (char**) malloc(10000);
-    //*shared_count = 3;
-
     if (child_id == 0)
     {
         int pipe_id = fork();
+        // Create the fork that finds the commands
         if (pipe_id == 0)
         {
-
+            // Read the commands and save them to shared memory
             readFile("sample_in.txt", shared_memory, shared_count);
             for (int i = 0; i < *shared_count; i++)
-            {
-                printf("%s??????????", shared_memory[i]);
-            }
-            //char **x = strcpy(shared_memory);
-            // *shared_memory = "New string";
-            //printf("+++>%s<++++", *shared_memory);
-
-            close(fd[0]);
-            write(fd[1], shared_memory, sizeof(shared_memory));
-            close(fd[1]);
+                printf("%s", shared_memory[i]);
         }
+        // This fork is for running the commands once the previous one finds them
         else
         {
+            wait(NULL);
+            // Create a pipe for each command
             int pipes[*shared_count + 1][2];
             int run_id[*shared_count];
 
-            printf("%d <><>< > %s \n", *shared_count, *shared_memory);
-            // if(fork() ==0)
             //  Write the commands to pipes
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < *shared_count; i++)
             {
                 if (pipe(pipes[i]) == -1)
-                {
                     printf("Error Occurred");
-                }
 
-                char x[] = "STringshared_memory[i]";
+                char *x = shared_memory[i];
                 write(pipes[i][1], x, sizeof(char) * 256);
             }
 
-            // else{
-            //  wait(NULL);
-
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < *shared_count; i++)
             {
                 run_id[i] = fork();
 
+                // Create a fork for each command and pipe to it to pass it a command
                 if (run_id[i] == 0)
                 {
-                    /*for(int j = 0; j < 3+1; j++)
-                    {
-                        if(i != j){
-                            close(pipes[j][0]);
-
-                        }
-                        if(i + 1 != j){
-                            close(pipes[j][1]);
-                        }
-                    }*/
-
                     char tempS[256];
+                    char output[256];
                     read(pipes[i][0], tempS, 256);
                     printf("Im a run ID: %s \n", tempS);
-                    printf("TESTING FORK:\n");
+
+                    FILE *cmd = popen(tempS, "r");
+                    char result[256] = {0x0};
+                    fgets(result, sizeof(result), cmd);
+                    printf("Output: %s\n", result);
+                    pclose(cmd);
+
+                    writeOutput(tempS, result);
 
                     return 0;
                 }
             }
 
-            for (int i = 0; i < 3; i++)
-            {
+            for (int i = 0; i < *shared_count; i++)
                 wait(NULL);
-            }
-            char **y = malloc(4096);
-            close(fd[1]);
-            read(fd[0], y, sizeof(y));
-            close(fd[0]);
-            printf("%s<====\n", y[0]);
-
-            //}
         }
     }
+    // Kill unused processes
     else
     {
-        printf("%sTHELOOP", shared_memory[0]);
-        return 0; // wait(NULL);
+        return 0;
     }
 
-    printf("%s?\n", shared_memory[2]);
     return 0;
 }
