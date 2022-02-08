@@ -6,6 +6,10 @@ The output of: pwd : is
 >>>>>>>>>>>>>>>>>
 /Users/schoolaccount/Documents/GitHub/C_code/A01/GoodCopy
 <<<<<<<<<<<<<<<<
+The output of: uptime -p
+ : is
+>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<
 The output of: whoami
  : is
 >>>>>>>>>>>>>>>>>
@@ -14,9 +18,27 @@ schoolaccount
 The output of: ls -l -a -F
  : is
 >>>>>>>>>>>>>>>>>
-total 168
+total 96
+<<<<<<<<<<<<<<<<
+The output of: free -h
+ : is
+>>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<
+The output of: pwd : is
+>>>>>>>>>>>>>>>>>
+/Users/schoolaccount/Documents/GitHub/C_code/A01/GoodCopy
 <<<<<<<<<<<<<<<<
 The output of: uptime -p
  : is
 >>>>>>>>>>>>>>>>>
+<<<<<<<<<<<<<<<<
+The output of: whoami
+ : is
+>>>>>>>>>>>>>>>>>
+schoolaccount
+<<<<<<<<<<<<<<<<
+The output of: ls -l -a -F
+ : is
+>>>>>>>>>>>>>>>>>
+total 96
 <<<<<<<<<<<<<<<<
