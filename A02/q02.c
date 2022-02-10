@@ -42,6 +42,11 @@ void *average()
     return NULL;
 }
 
+int cmpfunc(const void *a, const void *b)
+{
+    return (*(int *)a - *(int *)b);
+}
+
 void *max()
 {
     int max = 0;
@@ -78,7 +83,7 @@ void *median()
 
     if (size % 2 == 0)
     {
-        median = (list[size / 2] + list[size / 2 - 1]) / 2;
+        median = ((float)(list[size / 2] + list[size / 2 - 1]) )/ 2;
     }
     else
     {
@@ -100,6 +105,8 @@ int main(int argc, char *argv[])
     //  int lst []= {98, 100, 102, 43, 43, 54, 64, 12, 43, 54, 11, 23};
     list = lst;
     size = (int)(sizeof(lst) / sizeof(lst[0]));
+
+    qsort(lst, size, sizeof(int), cmpfunc);
 
     pthread_t thread_id;
     pthread_t thread_id2;

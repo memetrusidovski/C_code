@@ -13,6 +13,8 @@ void startClock();	   // function to start program clock
 long getCurrentTime(); // function to check current time since clock was started
 time_t programClock;   // the global timer/clock for the program
 
+int count = 0;
+
 typedef struct thread // represents a single thread
 {
 	char *tid; // id of the thread as read from file
@@ -39,11 +41,26 @@ int main(int argc, char *argv[])
 
 	readFile(name, threads);
 
-	/*while () // put a suitable condition here to run your program
+	//This is the time step
+	int j = 1;
+	pthread_t **thread_id;
+	Thread temp;
+	temp = *threads[0];
+
+	int len = count;
+	
+	while (j <= len) // put a suitable condition here to run your program
 	{
 		// write suitable code here to run the threads
-		gcc Question3_Code_Skeleton.c -o q03 && ./q03
-	}*/
+		//gcc Question3_Code_Skeleton.c -o q03 && ./q03
+		
+		printf("%d ", temp.startTime);
+		
+		if(j < len) temp = *threads[j];
+
+		j++;
+	}
+
 
 	return 0;
 }
@@ -97,6 +114,8 @@ int readFile(char *fileName, Thread **threads) // use this method in a suitable 
 		i++;
 		command = strtok(NULL, "\r\n");
 	}
+
+	count = threadCount;
 
 	for (int k = 0; k < threadCount; k++)
 	{
