@@ -21,7 +21,7 @@ Version  2022-02-07
 
 void *multiThread(void *vargp)
 {
-    printf("Custom thread created successfully\n");
+    printf("Custom thread created successfully %d\n", *(int *)vargp);
 
     for (int i = 0; i <= 4; i++)
     {
@@ -36,21 +36,20 @@ int main(void)
 {
     printf("This program would create threads\n");
 
-    if (fork() == 0)
-    {
-        pthread_t thread_id;
+    pthread_t thread_id;
 
-        pthread_create(&thread_id, NULL, &multiThread, NULL);
-        pthread_join(thread_id, NULL);
-    }
-    else
+    int *x = malloc(sizeof(int));
+    *x = 5;
+    pthread_create(&thread_id, NULL, &multiThread, x);
+    
+
+    for (int i = 0; i <= 4; i++)
     {
-        for (int i = 0; i <= 4; i++)
-        {
-            printf("I am the process thread created by the complier by default.\n");
-            sleep(1);
-        }
+        printf("I am the process thread created by the complier by default.\n");
+        sleep(1);
     }
+
+    pthread_join(thread_id, NULL);
 
     return 0;
 }

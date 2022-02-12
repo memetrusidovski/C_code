@@ -30,13 +30,14 @@ int readFile(char *fileName, Thread **threads); // function to read the file con
 
 int main(int argc, char *argv[])
 {
-	/*if (argc < 2)
+	if (argc < 2)
 	{
 		printf("Input file name missing...exiting with error code -1\n");
 		return -1;
-	}*/
+	}
 
 	char *name = "file.txt";
+	name = argv[1];
 	Thread **threads = (Thread **)malloc(sizeof(Thread));
 
 	readFile(name, threads);
