@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 	startClock();
 	long time = getCurrentTime();
 	int run = 0;
-	pthread_t *lastThread = (pthread_t *) malloc(sizeof(pthread_t) * count);
+	pthread_t lastThread [count];// = (pthread_t *) malloc(sizeof(pthread_t) * count);
 
 	while(time < 100 && run < count){
 		//This is the time step
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 	}
 
 	//Make sure all the threads are done before terminating
-	//for(int i = 0; i < count; i++)
+	for(int i = 0; i < count; i++)
 		pthread_join(lastThread[1], NULL);
 
 	return 0;
