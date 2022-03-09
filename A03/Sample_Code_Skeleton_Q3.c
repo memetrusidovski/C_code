@@ -5,6 +5,7 @@
 #include <pthread.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <semaphore.h>
 
 sem_t running;
 sem_t even;
