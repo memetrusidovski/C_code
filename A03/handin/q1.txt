@@ -1,0 +1,4 @@
+The scenario does meet the requirements. it insures only two of the three
+philosophers are eating at once. it makes sure that each person eating has at
+least two chopsticks while eating. if the code produced two adjacent philosophers
+eating at once it would violate the solution and result in deadlock.
